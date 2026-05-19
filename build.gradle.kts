@@ -2,10 +2,14 @@ plugins {
 	java
 	id("org.springframework.boot") version "4.0.6"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("com.google.protobuf") version "0.9.4"
 }
 
 group = "com.henry"
 version = "0.0.1-SNAPSHOT"
+
+val grpcVersion = "1.63.0"
+val protobufVersion = "3.25.3"
 
 java {
 	toolchain {
@@ -35,6 +39,37 @@ dependencies {
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")
+	implementation("com.google.api.grpc:proto-google-common-protos:2.71.0")
+}
+
+protobuf {
+	protoc {
+		artifact = "com.google.protobuf:protoc:$protobufVersion"
+	}
+	plugins {
+		create("grpc") {
+			artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+		}
+	}
+	generateProtoTasks {
+		all().forEach {
+			it.plugins {
+				create("grpc")
+			}
+		}
+	}
+}
+
+sourceSets {
+	main {
+		proto {
+			srcDir("src/main/proto")
+		}
+		java {
+			srcDirs("build/generated/source/proto/main/grpc")
+			srcDirs("build/generated/source/proto/main/java")
+		}
+	}
 }
 
 tasks.withType<Test> {
