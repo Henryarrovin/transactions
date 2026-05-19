@@ -22,6 +22,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.hibernate:hibernate-core:7.3.4.Final")
+	implementation("org.springframework.data:spring-data-jpa:4.1.0-M2")
 	implementation("org.flywaydb:flyway-database-postgresql")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
