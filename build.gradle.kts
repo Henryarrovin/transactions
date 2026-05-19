@@ -8,7 +8,7 @@ plugins {
 group = "com.henry"
 version = "0.0.1-SNAPSHOT"
 
-val grpcVersion = "1.63.0"
+val grpcVersion = "1.81.0"
 val protobufVersion = "3.25.3"
 
 java {
@@ -40,6 +40,9 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")
 	implementation("com.google.api.grpc:proto-google-common-protos:2.71.0")
+	implementation("io.grpc:grpc-netty-shaded:${grpcVersion}")
+	implementation("io.grpc:grpc-protobuf:${grpcVersion}")
+	implementation("io.grpc:grpc-stub:${grpcVersion}")
 }
 
 protobuf {
