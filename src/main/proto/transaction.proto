@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package transaction.v1;
+
+import "google/api/annotations.proto";
+
+option java_package = "com.henry.transaction.grpc.proto";
+option java_outer_classname = "TransactionProto";
+option java_multiple_files = true;
+
+service TransactionService {
+    rpc RecordTransaction (RecordTransactionRequest) returns (RecordTransactionResponse) {
+        option (google.api.http) = {
+            post: "/v1/transactions"
+            body: "*"
+        };
+    }
+    rpc GetBalance (GetBalanceRequest) returns (GetBalanceResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/balance"
+        };
+    }
+    rpc GetTransaction (GetTransactionRequest) returns (GetTransactionResponse) {
+        option (google.api.http) = {
+            get: "/v1/transactions/{transaction_id}"
+        };
+    }
+    rpc ListTransactions (ListTransactionsRequest) returns (ListTransactionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/transactions"
+        };
+    }
+    rpc GetStatement (GetStatementRequest) returns (GetStatementResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/statements/{year}/{month}"
+        };
+    }
+    rpc Reconcile (ReconcileRequest) returns (ReconcileResponse) {
+        option (google.api.http) = {
+            post: "/v1/reconcile"
+            body: "*"
+        };
+    }
+}
+
+message RecordTransactionRequest {
+    string user_id             = 1;
+    string type                = 2;
+    int64  amount              = 3;
+    string currency            = 4;
+    string provider_order_id   = 5;
+    string provider_payment_id = 6;
+    string provider_refund_id  = 7;
+    string reference_id        = 8;
+    string description         = 9;
+    string metadata            = 10;
+}
+
+message RecordTransactionResponse {
+    string transaction_id = 1;
+    string status         = 2;
+    int64  balance        = 3;
+    string message        = 4;
+}
+
+message GetBalanceRequest {
+    string user_id = 1;
+}
+
+message GetBalanceResponse {
+    string user_id  = 1;
+    int64  balance  = 2;
+    string currency = 3;
+}
+
+message GetTransactionRequest {
+    string transaction_id = 1;
+}
+
+message GetTransactionResponse {
+    string transaction_id      = 1;
+    string user_id             = 2;
+    string type                = 3;
+    string status              = 4;
+    int64  amount              = 5;
+    string currency            = 6;
+    string provider_payment_id = 7;
+    string description         = 8;
+    string created_at          = 9;
+}
+
+message ListTransactionsRequest {
+    string user_id    = 1;
+    string type       = 2;
+    string status     = 3;
+    string start_date = 4;
+    string end_date   = 5;
+    int32  page       = 6;
+    int32  page_size  = 7;
+}
+
+message ListTransactionsResponse {
+    repeated GetTransactionResponse transactions = 1;
+    int64  total     = 2;
+    int32  page      = 3;
+    int32  page_size = 4;
+}
+
+message GetStatementRequest {
+    string user_id = 1;
+    int32  month   = 2;
+    int32  year    = 3;
+}
+
+message GetStatementResponse {
+    string user_id           = 1;
+    int32  month             = 2;
+    int32  year              = 3;
+    int64  opening_balance   = 4;
+    int64  closing_balance   = 5;
+    int64  total_credits     = 6;
+    int64  total_debits      = 7;
+    int32  transaction_count = 8;
+    repeated GetTransactionResponse transactions = 9;
+}
+
+message ReconcileRequest {
+    string provider_payment_id = 1;
+    string provider_order_id   = 2;
+    int64  expected_amount     = 3;
+}
+
+message ReconcileResponse {
+    string status        = 1;
+    string message       = 2;
+    int64  actual_amount = 3;
+    string notes         = 4;
+}
