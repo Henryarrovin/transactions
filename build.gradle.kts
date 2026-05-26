@@ -45,6 +45,7 @@ dependencies {
 	implementation("io.grpc:grpc-stub:${grpcVersion}")
 	implementation("net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE")
 	implementation("net.devh:grpc-client-spring-boot-starter:3.1.0.RELEASE")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
 }
 
 protobuf {
