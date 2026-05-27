@@ -58,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction tx = Transaction.builder()
                 .userId(req.getUserId())
                 .type(type)
-                .status(TransactionStatus.pending)
+                .status(TransactionStatus.PENDING)
                 .amount(req.getAmount())
                 .currency(req.getCurrency() != null ? req.getCurrency() : "INR")
                 .providerOrderId(req.getProviderOrderId())
@@ -75,14 +75,14 @@ public class TransactionServiceImpl implements TransactionService {
         long newBalance = updateWalletAndLedger(tx);
 
         // Mark transaction as completed
-        tx.setStatus(TransactionStatus.completed);
+        tx.setStatus(TransactionStatus.COMPLETED);
         transactionRepository.save(tx);
 
         log.info("Transaction recorded: id={} balance={}", tx.getId(), newBalance);
 
         return RecordTransactionResponse.builder()
                 .transactionId(tx.getId().toString())
-                .status(TransactionStatus.completed.name())
+                .status(TransactionStatus.COMPLETED.name())
                 .balance(newBalance)
                 .message("Transaction recorded successfully")
                 .build();
@@ -112,21 +112,21 @@ public class TransactionServiceImpl implements TransactionService {
         String description;
 
         switch (tx.getType()) {
-            case payment -> {
+            case PAYMENT -> {
                 // Payment: debit the wallet
                 newBalance = previousBalance - tx.getAmount();
-                entryType = EntryType.debit;
+                entryType = EntryType.DEBIT;
                 description = "Payment: " + (tx.getDescription() != null ? tx.getDescription() : tx.getProviderPaymentId());
             }
-            case refund -> {
+            case REFUND -> {
                 // Refund: credit the wallet
                 newBalance = previousBalance + tx.getAmount();
-                entryType = EntryType.credit;
+                entryType = EntryType.CREDIT;
                 description = "Refund: " + (tx.getDescription() != null ? tx.getDescription() : tx.getProviderRefundId());
             }
             default -> {
                 newBalance = previousBalance;
-                entryType = EntryType.credit;
+                entryType = EntryType.CREDIT;
                 description = tx.getDescription() != null ? tx.getDescription() : "Transfer";
             }
         }
@@ -284,7 +284,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (txOpt.isEmpty()) {
             // Transaction isn't found in our records
-            status = ReconciliationStatus.missing;
+            status = ReconciliationStatus.MISSING;
             message = "Transaction not found in transaction-service records";
             notes = "Provider payment ID " + req.getProviderPaymentId() + " has no matching transaction";
         } else {
@@ -292,11 +292,11 @@ public class TransactionServiceImpl implements TransactionService {
             actualAmount = tx.getAmount();
 
             if (actualAmount == req.getExpectedAmount()) {
-                status = ReconciliationStatus.matched;
+                status = ReconciliationStatus.MATCHED;
                 message = "Transaction amounts match";
                 notes = "Expected: " + req.getExpectedAmount() + ", Actual: " + actualAmount;
             } else {
-                status = ReconciliationStatus.mismatched;
+                status = ReconciliationStatus.MISMATCHED;
                 message = "Amount mismatch detected";
                 notes = "Expected: " + req.getExpectedAmount() + ", Actual: " + actualAmount
                         + ", Difference: " + (actualAmount - req.getExpectedAmount());

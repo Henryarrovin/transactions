@@ -69,8 +69,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("""
             SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t
             WHERE t.userId = :userId
-            AND t.type = 'payment'
-            AND t.status = 'completed'
+            AND t.type = com.henry.transactions.enums.TransactionType.PAYMENT
+            AND t.status = com.henry.transactions.enums.TransactionStatus.COMPLETED
             AND t.createdAt BETWEEN :start AND :end
             """)
     Long sumPaymentsByUserAndDateRange(
@@ -82,8 +82,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("""
             SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t
             WHERE t.userId = :userId
-            AND t.type = 'refund'
-            AND t.status = 'completed'
+            AND t.type = com.henry.transactions.enums.TransactionType.REFUND
+            AND t.status = com.henry.transactions.enums.TransactionStatus.COMPLETED
             AND t.createdAt BETWEEN :start AND :end
             """)
     Long sumRefundsByUserAndDateRange(

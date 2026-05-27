@@ -4,8 +4,6 @@ import com.henry.transactions.enums.EntryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,8 +29,9 @@ public class LedgerEntry {
     private String userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "entry_type")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+//    @Column(nullable = false, columnDefinition = "entry_type")
+//    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "type", nullable = false)
     private EntryType type; // debit / credit
 
     @Column(nullable = false)
