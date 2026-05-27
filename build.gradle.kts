@@ -81,6 +81,10 @@ tasks.processResources {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+	jvmArgs("-Duser.timezone=UTC")
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
