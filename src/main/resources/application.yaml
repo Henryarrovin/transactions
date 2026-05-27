@@ -10,63 +10,70 @@ spring:
     username: ${TRANSACTION_DB_USER:postgres}
     password: ${TRANSACTION_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
 
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+    show-sql: false
+
+    properties:
       hibernate:
-        ddl-auto: validate
-      show-sql: false
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-          format_sql: true
-          default_schema: public
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: public
 
-    flyway:
-      enabled: true
-      locations: classpath:db/migration
-      baseline-on-migrate: true
-
-    kafka:
-      bootstrap-servers: ${TRANSACTION_KAFKA_BROKERS:localhost:9092}
-      consumer:
-        group-id: ${TRANSACTION_KAFKA_GROUP_ID:transaction-payment-consumer}
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        enable-auto-commit: false
-      producer:
-        key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      listener:
-        ack-mode: MANUAL_IMMEDIATE
-
-  grpc:
-    server:
-      port: ${TRANSACTION_GRPC_PORT:50053}
-      security:
-        enabled: false
-
-    client:
-      auth-service:
-        address: static://${TRANSACTION_AUTH_GRPC_ADDRESS:localhost:50051}
-        negotiation-type: plaintext
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
   kafka:
-    topics:
-      payment-events: ${TRANSACTION_KAFKA_PAYMENT_TOPIC:payment-events}
-      transaction-logs: ${TRANSACTION_KAFKA_LOG_TOPIC:transaction-service-logs}
+    bootstrap-servers: ${TRANSACTION_KAFKA_BROKERS:localhost:9092}
 
-  app:
-    auth:
-      canonical-secret: ${TRANSACTION_AUTH_GRPC_CANONICAL_SECRET:dev-canonical}
-      service-name: ${TRANSACTION_AUTH_GRPC_SERVICE_NAME:transaction-service}
-      timeout-seconds: 5
+    consumer:
+      group-id: ${TRANSACTION_KAFKA_GROUP_ID:transaction-payment-consumer}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
 
-  logging:
-    level:
-      com.henry.transaction: DEBUG
-      org.hibernate.SQL: DEBUG
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+
+grpc:
+  server:
+    port: ${TRANSACTION_GRPC_PORT:50053}
+
+    security:
+      enabled: false
+
+  client:
+    auth-service:
+      address: static://${TRANSACTION_AUTH_GRPC_ADDRESS:localhost:50051}
+      negotiation-type: plaintext
+
+kafka:
+  topics:
+    payment-events: ${TRANSACTION_KAFKA_PAYMENT_TOPIC:payment-events}
+    transaction-logs: ${TRANSACTION_KAFKA_LOG_TOPIC:transaction-service-logs}
+
+app:
+  auth:
+    canonical-secret: ${TRANSACTION_AUTH_GRPC_CANONICAL_SECRET:dev-canonical}
+    service-name: ${TRANSACTION_AUTH_GRPC_SERVICE_NAME:transaction-service}
+    timeout-seconds: 5
+
+logging:
+  level:
+    com.henry.transaction: DEBUG
+    org.hibernate.SQL: DEBUG

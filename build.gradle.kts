@@ -78,6 +78,10 @@ sourceSets {
 	}
 }
 
+tasks.processResources {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
