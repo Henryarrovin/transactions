@@ -15,14 +15,14 @@ CREATE INDEX idx_wallets_user_id ON wallets(user_id);
 -- Transactions
 -- High-level record per payment/refund
 
-CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer');
-CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'reversed');
+CREATE TYPE transaction_type AS ENUM ('PAYMENT', 'REFUND', 'TRANSFER');
+CREATE TYPE transaction_status AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'REVERSED');
 
 CREATE TABLE IF NOT EXISTS transactions (
     id                  UUID               PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id             VARCHAR(255)       NOT NULL,
     type                transaction_type   NOT NULL,
-    status              transaction_status NOT NULL DEFAULT 'pending',
+    status              transaction_status NOT NULL DEFAULT 'PENDING',
     amount              BIGINT             NOT NULL,  -- in paise
     currency            VARCHAR(10)        NOT NULL DEFAULT 'INR',
     provider_order_id   VARCHAR(255),
@@ -44,7 +44,7 @@ CREATE INDEX idx_transactions_created_at          ON transactions(created_at);
 -- Ledger Entries
 -- Double-entry bookkeeping — every transaction creates debit + credit entries
 
-CREATE TYPE entry_type AS ENUM ('debit', 'credit');
+CREATE TYPE entry_type AS ENUM ('DEBIT', 'CREDIT');
 
 CREATE TABLE IF NOT EXISTS ledger_entries (
     id             UUID       PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -85,7 +85,7 @@ CREATE INDEX idx_statements_user_id ON statements(user_id);
 
 -- Reconciliation Records
 
-CREATE TYPE reconciliation_status AS ENUM ('matched', 'mismatched', 'missing');
+CREATE TYPE reconciliation_status AS ENUM ('MATCHED', 'MISMATCHED', 'MISSING');
 
 CREATE TABLE IF NOT EXISTS reconciliation_records (
     id                  UUID                   PRIMARY KEY DEFAULT gen_random_uuid(),
