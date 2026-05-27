@@ -22,12 +22,11 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
-	implementation("org.springframework.boot:spring-boot-starter-validation:4.1.0-M3")
-	implementation("org.hibernate:hibernate-core:7.3.4.Final")
-	implementation("org.springframework.data:spring-data-jpa:4.1.0-M2")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.flywaydb:flyway-database-postgresql")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -76,6 +75,14 @@ sourceSets {
 			srcDirs("build/generated/source/proto/main/java")
 		}
 	}
+}
+
+tasks.processResources {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+	jvmArgs("-Duser.timezone=UTC")
 }
 
 tasks.withType<Test> {

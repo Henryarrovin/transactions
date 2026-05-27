@@ -17,7 +17,7 @@ build:
 	gradlew.bat build
 
 run:
-	gradlew.bat bootRun
+	cd scripts && ./start.sh
 
 clean:
 	gradlew.bat clean

@@ -5,9 +5,7 @@ import com.henry.transactions.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,15 +28,17 @@ public class Transaction {
     private String userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "transaction_type")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+//    @Column(nullable = false, columnDefinition = "transaction_type")
+//    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "type", nullable = false)
     private TransactionType type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "transaction_status")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+//    @Column(nullable = false, columnDefinition = "transaction_status")
+//    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false)
     @Builder.Default
-    private TransactionStatus status = TransactionStatus.pending;
+    private TransactionStatus status = TransactionStatus.PENDING;
 
     @Column(nullable = false)
     private Long amount; // in paise
