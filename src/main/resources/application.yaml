@@ -79,3 +79,5 @@ logging:
   level:
     com.henry.transaction: DEBUG
     org.hibernate.SQL: DEBUG
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients.Metadata: ERROR
