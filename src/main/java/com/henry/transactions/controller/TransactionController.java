@@ -4,8 +4,11 @@ import com.henry.transactions.dto.request.ListTransactionsRequest;
 import com.henry.transactions.dto.request.ReconcileRequest;
 import com.henry.transactions.dto.request.RecordTransactionRequest;
 import com.henry.transactions.dto.response.*;
-import com.henry.transactions.grpc.AuthGrpcClient;
+import com.henry.transactions.exception.TransactionException;
 import com.henry.transactions.service.TransactionService;
+import com.henry.transactions.grpc.AuthServiceGrpc;
+import com.henry.transactions.grpc.ValidateTokenRequest;
+import com.henry.transactions.grpc.ValidateTokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final AuthGrpcClient authGrpcClient;
+    private final AuthServiceGrpc.AuthServiceBlockingStub authGrpcClient;
 
     // Record Transaction
 
@@ -42,9 +45,9 @@ public class TransactionController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String userId) {
 
-        var claims = validateToken(authHeader);
+        ValidateTokenResponse claims = validateToken(authHeader);
         // Users can only see their own balance; admins can see anyone's
-        if (!claims.getRoles().contains("admin") && !claims.getUserId().equals(userId)) {
+        if (!claims.getRolesList().contains("admin") && !claims.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         log.info("GET /transactions/balance/{}", userId);
@@ -76,8 +79,8 @@ public class TransactionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize) {
 
-        var claims = validateToken(authHeader);
-        if (!claims.getRoles().contains("admin") && !claims.getUserId().equals(userId)) {
+        ValidateTokenResponse claims = validateToken(authHeader);
+        if (!claims.getRolesList().contains("admin") && !claims.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -102,8 +105,8 @@ public class TransactionController {
             @RequestParam int month,
             @RequestParam int year) {
 
-        var claims = validateToken(authHeader);
-        if (!claims.getRoles().contains("admin") && !claims.getUserId().equals(userId)) {
+        ValidateTokenResponse claims = validateToken(authHeader);
+        if (!claims.getRolesList().contains("admin") && !claims.getUserId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -118,8 +121,8 @@ public class TransactionController {
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody ReconcileRequest request) {
 
-        var claims = validateToken(authHeader);
-        if (!claims.getRoles().contains("admin")) {
+        ValidateTokenResponse claims = validateToken(authHeader);
+        if (!claims.getRolesList().contains("admin")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -136,15 +139,26 @@ public class TransactionController {
 
     // Token validation helper
 
-    private AuthGrpcClient.ValidateResult validateToken(String authHeader) {
+    private ValidateTokenResponse validateToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new com.henry.transactions.exception.TransactionException("Missing or invalid Authorization header");
+            throw new TransactionException("Missing or invalid Authorization header");
         }
+
         String token = authHeader.substring(7);
-        var result = authGrpcClient.validateToken(token);
-        if (!result.isValid()) {
-            throw new com.henry.transactions.exception.TransactionException("Invalid or expired token: " + result.getError());
+        ValidateTokenResponse result =
+                authGrpcClient.validateToken(
+                        ValidateTokenRequest.newBuilder()
+                                .setToken(token)
+                                .build()
+                );
+
+        if (!result.getValid()) {
+            throw new TransactionException(
+                    "Invalid or expired token: " + result.getError()
+            );
         }
+
         return result;
     }
+
 }
