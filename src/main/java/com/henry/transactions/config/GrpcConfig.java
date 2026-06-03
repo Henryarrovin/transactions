@@ -1,13 +1,19 @@
 package com.henry.transactions.config;
 
+import com.henry.transactions.grpc.AuthServiceGrpc;
 import io.grpc.*;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
 public class GrpcConfig {
+
+    @Value("${grpc.client.auth-service.address}")
+    private String address;
 
     // Server interceptor — logs all gRPC calls
 
@@ -40,4 +46,24 @@ public class GrpcConfig {
             }
         };
     }
+
+    @Bean
+    public ManagedChannel authChannel() {
+        String target = address.replace("static://", "");
+
+        String[] parts = target.split(":");
+        String host = parts[0];
+        int port = Integer.parseInt(parts[1]);
+
+        return ManagedChannelBuilder
+                .forAddress(host, port)
+                .usePlaintext()
+                .build();
+    }
+
+    @Bean
+    public AuthServiceGrpc.AuthServiceBlockingStub authGrpcClient(ManagedChannel authChannel) {
+        return AuthServiceGrpc.newBlockingStub(authChannel);
+    }
+
 }
