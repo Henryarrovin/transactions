@@ -371,7 +371,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionType parseType(String type) {
         try {
-            return TransactionType.valueOf(type.toLowerCase());
+            return TransactionType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new TransactionException("Invalid transaction type: " + type);
         }
@@ -379,7 +379,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionStatus parseStatus(String status) {
         try {
-            return TransactionStatus.valueOf(status.toLowerCase());
+            return TransactionStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new TransactionException("Invalid transaction status: " + status);
         }
