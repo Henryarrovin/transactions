@@ -5,7 +5,9 @@ import com.henry.transactions.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,15 +30,13 @@ public class Transaction {
     private String userId;
 
     @Enumerated(EnumType.STRING)
-//    @Column(nullable = false, columnDefinition = "transaction_type")
-//    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = false, columnDefinition = "transaction_type")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private TransactionType type;
 
     @Enumerated(EnumType.STRING)
-//    @Column(nullable = false, columnDefinition = "transaction_status")
-//    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "transaction_status")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Builder.Default
     private TransactionStatus status = TransactionStatus.PENDING;
 
@@ -62,7 +62,8 @@ public class Transaction {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "JSONB")
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
